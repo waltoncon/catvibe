@@ -1,8 +1,7 @@
 <template>
     <div>
         <video ref="video" autoplay loop muted playsinline class="w-screen h-screen object-cover" @click="play">
-            <source src="/catvibe.mp4"
-                    type="video/mp4">
+            <source src="/catvibe.mp4" type="video/mp4">
             Sorry, your browser doesn't support embedded videos.
         </video>
 
@@ -86,6 +85,7 @@ export default defineComponent({
             }
 
             tooFast.value = false;
+            tooSlow.value = false;
             video.value.playbackRate = rate
         };
 
