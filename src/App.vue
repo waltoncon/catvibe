@@ -1,6 +1,6 @@
 <template>
     <div>
-        <video ref="video" autoplay loop muted class="w-screen h-screen object-cover">
+        <video ref="video" autoplay loop muted playsinline class="w-screen h-screen object-cover" @click="play">
             <source src="/catvibe.mp4"
                     type="video/mp4">
             Sorry, your browser doesn't support embedded videos.
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref, watch} from 'vue'
+import {computed, defineComponent, onMounted, ref, watch, Ref} from 'vue'
 import {mdiDotsHorizontal} from '@mdi/js';
 import TInput from "./components/TInput.vue";
 
@@ -47,7 +47,7 @@ export default defineComponent({
     components: {TInput},
     setup() {
         const bpm = 121;
-        const video = ref(null);
+        const video: Ref<HTMLVideoElement | null> = ref(null);
         const show = ref(false);
         const tooFast = ref(false);
         const tooSlow = ref(false);
@@ -66,7 +66,13 @@ export default defineComponent({
             updatePlaybackRate(newValue)
         })
 
-        const updatePlaybackRate = (rate) => {
+        const play = () => video.value?.play();
+
+        const updatePlaybackRate = (rate: number) => {
+            if (video.value === null) {
+                return;
+            }
+
             if (rate < 0.1) {
                 tooSlow.value = true;
                 video.value.playbackRate = 0.1
@@ -94,7 +100,8 @@ export default defineComponent({
             timeSignature,
             nodsPerBar,
             playbackRate,
-            mdiDotsHorizontal
+            mdiDotsHorizontal,
+            play,
         }
     }
 })
