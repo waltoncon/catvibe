@@ -1,34 +1,45 @@
 <template>
     <div>
-        <video ref="video" autoplay loop muted playsinline class="w-screen h-screen object-cover" @click="play">
-            <source src="/catvibe.mp4" type="video/mp4">
+        <video ref="video" autoplay loop muted playsinline class="w-screen h-screen object-cover"
+               @click="play" :key="file">
+            <source :src="file" type="video/mp4">
             Sorry, your browser doesn't support embedded videos.
         </video>
 
         <div class="fixed bottom-0 left-0 p-4">
 
             <div class="mb-8 sm:mx-auto sm:w-full sm:max-w-md" v-if="show">
-                <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+                <div class="bg-white p-4 shadow sm:rounded-lg sm:px-10 rounded">
                     <form class="space-y-6" action="#" method="POST">
                         <div v-if="tooFast">
-                            Slow down dude, you'll wear vibe cat out
+                            Too fast!
                         </div>
                         <div v-if="tooSlow">
-                            Vibe cat can't go that slow
+                            Too slow!
                         </div>
 
                         <t-input v-model="tempo" label="Tempo"/>
                         <t-input v-model="timeSignature" label="Time Signature"/>
-                        <t-input v-model="nodsPerBar" label="Nods Per Bar"/>
+                        <t-input v-model="nodsPerBar" label="Beats Per Bar"/>
 
                         <div class="block text-sm font-medium text-gray-700">
                             Playback Rate: {{ playbackRate.toPrecision(2) }}
+                        </div>
+
+                        <div class="flex flex-col">
+                            <button v-for="(asset, index) of assets" :key="asset.file"
+                                    @click.prevent="selectedAsset = index"
+                                    class="py-2 px-3 mt-2 text-left bg-indigo-200 rounded focus:outline-none"
+                                    :class="{'ring': selectedAsset === index}">
+                                {{ asset.name }}
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <button type="button" @click="show = !show" class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button type="button" @click="show = !show"
+                    class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <icon class="h-5 w-5" type="mdi" :path="mdiDotsHorizontal"></icon>
             </button>
 
@@ -37,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onMounted, ref, watch, Ref} from 'vue'
+import {computed, defineComponent, onMounted, ref, Ref, watch} from 'vue'
 import {mdiDotsHorizontal} from '@mdi/js';
 import TInput from "./components/TInput.vue";
 
@@ -56,6 +67,13 @@ export default defineComponent({
         const playbackRate = computed(() => {
             return (tempo.value / bpm) / (timeSignature.value / nodsPerBar.value);
         })
+
+        const selectedAsset = ref(0);
+        const assets = [
+            {name: 'Cat', file: '/catvibe.mp4'},
+            {name: 'Step Grandma', file: '/step-grandma.mp4'}
+        ]
+        const file = computed(() => assets[selectedAsset.value].file)
 
         watch(() => playbackRate.value, (newValue) => {
             if (!video.value) {
@@ -102,6 +120,9 @@ export default defineComponent({
             playbackRate,
             mdiDotsHorizontal,
             play,
+            selectedAsset,
+            assets,
+            file
         }
     }
 })
