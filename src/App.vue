@@ -68,12 +68,22 @@ export default defineComponent({
             return (tempo.value / bpm) / (timeSignature.value / nodsPerBar.value);
         })
 
-        const selectedAsset = ref(0);
         const assets = [
             {name: 'Cat', file: '/catvibe.mp4'},
-            {name: 'Step Grandma', file: '/step-grandma.mp4'}
+            {name: 'Step Grandma', file: '/step-grandma.mp4'},
+            {name: 'Pedro', file: '/pedro.mp4'},
         ]
+
+        const hash = decodeURIComponent(window.location.hash.replace('#', '') || '');
+        const selectedAssetIndex = assets.findIndex(asset => asset.name === hash);
+
+        const selectedAsset = ref(selectedAssetIndex !== -1 ? selectedAssetIndex : 0);
         const file = computed(() => assets[selectedAsset.value].file)
+
+        watch(() => selectedAsset.value, () => {
+            const asset = assets[selectedAsset.value];
+            window.location.hash = asset.name;
+        })
 
         watch(() => playbackRate.value, (newValue) => {
             if (!video.value) {
